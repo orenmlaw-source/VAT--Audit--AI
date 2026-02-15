@@ -1,35 +1,40 @@
 import streamlit as st
+import os
+from google import genai
+from google.genai import types
 
 # הגדרת כיוון כתיבה לימין (RTL)
 st.markdown('<div style="direction: rtl; text-align: right;">', unsafe_allow_html=True)
 
-st.title("🛡️ מערכת מבקר מע״מ וזירת מלחמה משפטית")
+st.title("🛡️ מערכת מבקר מע״מ וזירת מלחמה")
 
-# תפריט צד (Sidebar) להיסטוריה והגדרות
+# תפריט צד (Sidebar)
 with st.sidebar:
-    st.header("היסטוריית בקשות")
-    st.write("כאן תופיע היסטוריית הדו"חות שלך")
+    st.header("היסטוריה")
+    st.write('כאן תופיע היסטוריית הדו"חות שלך') # השורה המתוקנת
 
-# אזור העלאת קבצים
-uploaded_file = st.file_uploader("העלה קובץ לביקורת (PDF)", type=['pdf'])
+# חיבור ל-API Key מתוך ה-Secrets
+try:
+    api_key = st.secrets["GOOGLE_API_KEY"]
+    client = genai.Client(api_key=api_key)
+except Exception as e:
+    st.error("שגיאה בחיבור למפתח ה-API. וודא שהגדרת אותו ב-Secrets.")
 
-# חלון כתיבת שאלה/מקרה
-user_input = st.text_area("תאר את מקרה המס או הדבק כתב טענות של הצד השני:")
+# ממשק המשתמש
+user_input = st.text_area("פרט את המקרה או הדבק טענות מהצד השני:")
 
-# כפתורי פעולה
-col1, col2, col3 = st.columns(3)
-with col1:
-    if st.button("בצע ביקורת מע״מ יזומה"):
-        st.info("מנתח את הנתונים אל מול ספר נמדר...")
-with col2:
-    if st.button("זירת מלחמה: ניתוח יריב"):
-        st.warning("מחפש סתירות משפטיות בכתב הטענות...")
-with col3:
-    if st.button("הכן טיוטת השגה"):
-        st.success("מנסח השגה משפטית רשמית...")
-
-# כפתור שליחה לוואטסאפ (יופעל בהמשך)
-if st.button("📱 שלח דו״ח סופי לוואטסאפ"):
-    st.write("שולח את הנתונים ל-API של WhatsApp...")
+if st.button("הפעל ניתוח מקצועי"):
+    if user_input:
+        with st.spinner("מנתח על בסיס ספרות מקצועית..."):
+            try:
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash", # המודל העדכני ביותר
+                    contents=user_input
+                )
+                st.markdown(f'<div style="direction: rtl;">{response.text}</div>', unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"שגיאה בהרצת הניתוח: {e}")
+    else:
+        st.error("אנא הזן טקסט לניתוח")
 
 st.markdown('</div>', unsafe_allow_html=True)
