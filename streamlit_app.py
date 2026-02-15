@@ -28,7 +28,7 @@ if st.button("הפעל ניתוח מקצועי"):
         with st.spinner("מנתח על בסיס ספרות מקצועית..."):
             try:
                 response = client.models.generate_content(
-                    model="gemini-2.0-flash", # המודל העדכני ביותר
+                    model="gemini-1.5-flash" # המודל העדכני ביותר
                     contents=user_input
                 )
                 st.markdown(f'<div style="direction: rtl;">{response.text}</div>', unsafe_allow_html=True)
