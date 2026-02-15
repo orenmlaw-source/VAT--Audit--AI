@@ -29,7 +29,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🛡️ זירת מלחמה משפטית: ניתוח מבוסס תאמ"ו ומאגר מקורות")
+# שימוש בגרש בודד בחוץ כדי לאפשר גרשיים בפנים
+st.title('🛡️ זירת מלחמה משפטית: ניתוח מבוסס תאמ"ו ומאגר מקורות')
 
 # 2. חיבור ל-API
 api_key = st.secrets.get("GOOGLE_API_KEY")
@@ -44,7 +45,7 @@ def get_existing_files():
         return []
 
 # 4. המוח המשפטי - מבוסס תאמ"ו, פסיקה וספרות
-SYSTEM_PROMPT = """
+SYSTEM_PROMPT = '''
 אתה "אסטרטג מס בכיר" המבצע ביקורת עומק לדיווחי מע"מ בגרסת War Room.
 תפקידך: לספק ניתוח משפטי שמשלב את כל מקורות הדין בישראל.
 
@@ -60,7 +61,7 @@ SYSTEM_PROMPT = """
 - בנה "זירת מלחמה": טיעונים משפטיים הסותרים את עמדת התאמ"ו על בסיס פסיקת העליון והמחוזי.
 
 ענה בעברית מיושרת לימין.
-"""
+'''
 
 # 5. סרגל צד לניהול המאגר
 with st.sidebar:
@@ -84,7 +85,7 @@ with st.sidebar:
 # 6. אזור העבודה המרכזי
 user_query = st.text_area(
     "הזן שאלה או דגשים לביקורת:", 
-    placeholder="למשל: נתח את סעיף הכיבודים בדו\"ח המצורף מול הוראות התאמ"ו והלכת פליי איט...",
+    placeholder='למשל: נתח את סעיף הכיבודים בדו"ח המצורף מול הוראות התאמ"ו והלכת פליי איט...',
     height=150
 )
 
@@ -92,7 +93,7 @@ if st.button("הפעל ניתוח אסטרטגי"):
     if not user_query and not uploaded_file:
         st.warning("אנא הזן שאלה או העלה מסמך.")
     else:
-        with st.spinner("סורק את התאמ"ו, הפסיקה ומאגר המקורות..."):
+        with st.spinner('סורק את התאמ"ו, הפסיקה ומאגר המקורות...'):
             context = f"הסתמך על הקבצים הבאים מהמאגר: {', '.join(selected_internal_files)}\n\n"
             content_parts = [context + user_query]
             
@@ -105,7 +106,9 @@ if st.button("הפעל ניתוח אסטרטגי"):
                     config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT, temperature=0.1),
                     contents=content_parts
                 )
-                st.markdown("### 🔍 ממצאי ה-War Room (ניתוח תאמ"ו ופסיקה):")
+                st.markdown('### 🔍 ממצאי ה-War Room (ניתוח תאמ"ו ופסיקה):')
                 st.markdown(f'<div class="report-container">{response.text}</div>', unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"שגיאה: {e}")
+
+st.markdown('---')
